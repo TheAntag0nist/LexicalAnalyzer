@@ -17,10 +17,10 @@ private:
 	std::string input;
 	int currentState;
 
-	std::map<std::string> keywords;
-	std::map<std::string> operators;
-	std::map<std::string> modifiers;
-	std::map<std::string> delimiters;
+	std::map<std::string, TOKENS_CLASS> keywords;
+	std::map<std::string, TOKENS_CLASS> operators;
+	std::map<std::string, TOKENS_CLASS> modifiers;
+	std::map<std::string, TOKENS_CLASS> delimiters;
 
 	std::list<std::string> alphabet;
 
