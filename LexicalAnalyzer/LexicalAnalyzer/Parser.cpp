@@ -36,6 +36,9 @@ void Parser::ReadFile(std::ifstream file) {
 
 void Parser::Analyze() {
 	// works like finite state machine
+	StateMachine machine;
+
+	machine.SetInput(data);
 }
 
 void Parser::DisplayResults() {

@@ -12,12 +12,16 @@
 #include <list>
 
 #include "AnalyzeExceprions.h"
+#include "StateMachine.h"
 #include "Token.h"
 
 class Parser {
 private:
 	std::string data;
 	std::list<Token> tokens;
+
+	std::list<std::string> indentifier;
+	std::list<std::string> constants;
 
 public:
 	Parser();

@@ -1,6 +1,8 @@
 #include "StateMachine.h"
 
-StateMachine::StateMachine() {}
+StateMachine::StateMachine() : currentState(GETCHAR) {
+	keywords["PROGRAMM"] = KEYWORDS;
+}
 
 StateMachine::~StateMachine() {}
 
@@ -13,5 +15,11 @@ void StateMachine::SetState(int state) {
 }
 
 void StateMachine::Action() {
+	int state = GETCHAR;
+	
 	// action on current state
+
+
+	// set new state
+	this->currentState = state;
 }
