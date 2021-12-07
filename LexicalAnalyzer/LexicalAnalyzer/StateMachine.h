@@ -11,10 +11,16 @@ enum STATE {
 
 class StateMachine {
 private:
+	std::string input;
 	int currentState;
 
 public:
+	StateMachine();
+	~StateMachine();
 
+	void SetInput(std::string inp);
+	void SetState(int state);
+	void Action();
 
 };
 

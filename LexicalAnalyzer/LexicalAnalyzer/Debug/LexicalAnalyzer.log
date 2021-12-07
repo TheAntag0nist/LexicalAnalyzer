@@ -1,4 +1,6 @@
-﻿  LexicAnalyzer.cpp
-  Source.cpp
+﻿  Parser.cpp
+  main.cpp
+  StateMachine.cpp
   Generating Code...
-  LexicalAnalyzer.vcxproj -> C:\Users\teoru\source\repos\LexicalAnalyzer\Debug\LexicalAnalyzer.exe
+  LINK : C:\Users\teoru\_projects\.MY_PRJ\LexicalAnalyzer\LexicalAnalyzer\Debug\LexicalAnalyzer.exe not found or not built by the last incremental link; performing full link
+  LexicalAnalyzer.vcxproj -> C:\Users\teoru\_projects\.MY_PRJ\LexicalAnalyzer\LexicalAnalyzer\Debug\LexicalAnalyzer.exe

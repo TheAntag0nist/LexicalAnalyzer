@@ -139,13 +139,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="LexicAnalyzer.cpp" />
-    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Parser.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="StateMachine.cpp" />
     <ClCompile Include="Token.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnalyzeExceprions.h" />
-    <ClInclude Include="LexicAnalyzer.h" />
+    <ClInclude Include="Parser.h" />
     <ClInclude Include="StateMachine.h" />
     <ClInclude Include="Token.h" />
   </ItemGroup>
