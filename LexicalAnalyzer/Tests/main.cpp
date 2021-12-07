@@ -2,7 +2,7 @@ PROGRAMM;
   integer x; 
   bool y; 
   string z; 
-  z=”www”;
+  z="www";
   
   WHILE 1 
    DO 

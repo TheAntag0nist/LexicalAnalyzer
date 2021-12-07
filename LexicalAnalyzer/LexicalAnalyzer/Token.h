@@ -4,9 +4,12 @@
 #include <string>
 
 enum TOKENS_CLASS {
+	VALUE,
+	COMMENT,
 	KEYWORDS,
-	DELIMITERS,
+	MODIFIER,
 	OPERATORS,
+	DELIMITERS,
 	ASSIGMENTS,
 	IDENTIFIERS
 };
@@ -15,6 +18,8 @@ class Token {
 private:
 	std::string tokenName;
 	std::string value;
+
+	TOKENS_CLASS type;
 
 public:
 	Token();

@@ -39,9 +39,9 @@ void Parser::Analyze() {
 }
 
 void Parser::DisplayResults() {
-	for(auto token : tokens){
 #ifdef _DEBUG
+	for(auto token : tokens){
 		std::cout << token.GetToken() << std::endl;
-#endif
 	}
+#endif
 }

@@ -1,4 +1,7 @@
 #include <iostream>
+#include <windows.h>
+
+#pragma execution_character_set( "utf-8" )
 
 // our libs
 #include "Parser.h"
@@ -6,8 +9,10 @@
 using namespace std;
 
 int main() {
+	SetConsoleOutputCP(65001);
+
 	Parser analyzer;
-	string path = "C:\\Users\\teoru\\_projects\\.MY_PRJ\\LexicalAnalyzer\\LexicalAnalyzer\\Tests\\";
+	string path = "C:\\";
 	string filename;
 
 	cout << "Enter file for lexic analyze: ";
