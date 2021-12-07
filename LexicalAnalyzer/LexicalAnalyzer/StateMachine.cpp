@@ -2,6 +2,20 @@
 
 StateMachine::StateMachine() : currentState(GETCHAR) {
 	keywords["PROGRAMM"] = KEYWORDS;
+	keywords["integer"] = KEYWORDS;
+	keywords["bool"] = KEYWORDS;
+	keywords["string"] = KEYWORDS;
+	keywords["WHILE"] = KEYWORDS;
+	keywords["DO"] = KEYWORDS;
+	keywords["EXITWHILE"] = KEYWORDS;
+	keywords["if"] = KEYWORDS;
+	keywords["ENDWHILE"] = KEYWORDS;
+	keywords["else"] = KEYWORDS;
+	keywords["endif"] = KEYWORDS;
+	keywords["FUNC"] = KEYWORDS;
+	keywords["ENDF"] = KEYWORDS;
+	keywords["END"] = KEYWORDS;
+
 }
 
 StateMachine::~StateMachine() {}
