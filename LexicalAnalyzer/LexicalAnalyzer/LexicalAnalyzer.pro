@@ -4,12 +4,13 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-        Source.cpp \
-        LexicAnalyzer.cpp \
-        Token.cpp
+        main.cpp \
+        Parser.cpp \
+        Token.cpp \
+        StateMachine.cpp
 
 HEADERS += \
-    LexicAnalyzer.h \
+    Parser.h \
     StateMachine.h \
     Token.h \
     AnalyzeExceprions.h
