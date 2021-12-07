@@ -2,6 +2,12 @@
 
 StateMachine::StateMachine() : currentState(GETCHAR) {
 	keywords["PROGRAMM"] = KEYWORDS;
+
+    keywords["CONST"] = KEYWORDS;
+    keywords["const"] = KEYWORDS;
+    keywords["'"]     = KEYWORDS;
+    keywords["\""]    = KEYWORDS;
+    keywords[" "]     = KEYWORDS;
 }
 
 StateMachine::~StateMachine() {}
