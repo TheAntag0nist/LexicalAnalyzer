@@ -19,19 +19,24 @@ private:
 	std::string tokenName;
 	std::string value;
 
-	TOKENS_CLASS type;
+	std::string codeData;
+	int line;
 
 public:
-	Token();
+	Token(std::string name = "", std::string value = "");
 	~Token();
 
 	void SetName(std::string name);
 	void SetValue(std::string value);
 
+	void SetCodeData(std::string data);
+	void SetLine(int ln);
+
 	std::string GetName();
 	std::string GetValue();
 
 	std::string GetToken();
+	std::string GetCodeInfo();
 
 };
 

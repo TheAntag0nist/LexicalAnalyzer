@@ -8,7 +8,7 @@ void Parser::ReadFile(std::string file) {
 	std::ifstream inputFile(file);
 
 	if (!inputFile.is_open())
-		throw new ReadException("file not open");
+		throw ReadException("file not open");
 	else {
 		std::stringstream buffer;
 		buffer << inputFile.rdbuf();
@@ -16,13 +16,13 @@ void Parser::ReadFile(std::string file) {
 	}
 
 #ifdef _DEBUG
-	std::cout << "[INF]:> Success reading;" << std::endl << "data = " << data;
+	std::cout << "[INF]:> Success reading;" << std::endl << "data = " << data << std::endl;
 #endif
 }
 
 void Parser::ReadFile(std::ifstream file) {
 	if (!file.is_open())
-		throw new ReadException("file not open");
+		throw ReadException("file not open");
 	else {
 		std::stringstream buffer;
 		buffer << file.rdbuf();
@@ -30,7 +30,7 @@ void Parser::ReadFile(std::ifstream file) {
 	}
 
 #ifdef _DEBUG
-		std::cout << "[INF]:> Success reading;" << std::endl << "data = " << data;
+		std::cout << "[INF]:> Success reading;" << std::endl << "data = " << data << std::endl;
 #endif
 }
 
@@ -39,12 +39,18 @@ void Parser::Analyze() {
 	StateMachine machine;
 
 	machine.SetInput(data);
+	machine.SetResultList(&tokens);
+
+	machine.Action();
 }
 
 void Parser::DisplayResults() {
 #ifdef _DEBUG
+	std::cout << "[INF]:> Analyzer results: " << std::endl;
+	// display header
 	for(auto token : tokens){
-		std::cout << token.GetToken() << std::endl;
+		std::cout << std::setw(24) << token.GetCodeInfo() << "\t"
+				  << std::setw(16) << token.GetToken() << std::endl;
 	}
 #endif
 }

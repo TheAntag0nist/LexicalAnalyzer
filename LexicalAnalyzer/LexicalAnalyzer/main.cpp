@@ -15,7 +15,7 @@ int main() {
 	string path = "C:\\";
 	string filename;
 
-	cout << "Enter file for lexic analyze: ";
+	cout << "[ENT]:> Enter file for lexic analyze: ";
 	getline(cin, filename);
 
 	try {
@@ -29,8 +29,11 @@ int main() {
 	}
 	catch (std::exception& ex) {
 		cout << "[ERR]:> " << ex.what() << endl;
+		system("pause>NULL");
 		return 1;
 	}
+
+	cout << "[INF]:> END WORK;" << endl;
 
 	system("pause>NULL");
 	return 0;

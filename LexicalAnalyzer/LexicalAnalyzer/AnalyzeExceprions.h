@@ -17,4 +17,17 @@ public:
 
 };
 
+class StateMachineException : public std::exception {
+private:
+	std::string msg;
+
+public:
+	StateMachineException(const std::string& msg) : msg(msg) {}
+
+	virtual const char* what() const noexcept override {
+		return msg.c_str();
+	}
+
+};
+
 #endif 
