@@ -16,6 +16,12 @@ StateMachine::StateMachine() : currentState(GETCHAR) {
 	keywords["ENDF"] = KEYWORDS;
 	keywords["END"] = KEYWORDS;
 
+	keywords["CONST"] = MODIFIER;
+	keywords["const"] = MODIFIER;
+	keywords["'"]  = DELIMITERS;
+	keywords["\""] = DELIMITERS;
+	keywords[" "]  = DELIMITERS;
+
 	operators["+"] = OPERATORS;
 	operators["-"] = OPERATORS;
 	operators["/"] = OPERATORS;
