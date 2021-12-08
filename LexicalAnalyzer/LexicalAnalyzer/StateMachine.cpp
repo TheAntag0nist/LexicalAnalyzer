@@ -1,10 +1,12 @@
 #include "StateMachine.h"
 
 int StateMachine::uniqID = 0;
+int StateMachine::funcID = 0;
 int StateMachine::constNumID = 0;
 
 StateMachine::StateMachine() : currentState(GETCHAR), currentLine(1) {
 	isString = false;
+	isFunc = false;
 
 	dictionary["EXITWHILE"] = KEYWORDS;
 	dictionary["ENDWHILE"] = KEYWORDS;
@@ -16,6 +18,7 @@ StateMachine::StateMachine() : currentState(GETCHAR), currentLine(1) {
 	dictionary["else"] = KEYWORDS;
 	dictionary["FUNC"] = KEYWORDS;
 	dictionary["ENDF"] = KEYWORDS;
+	dictionary["then"] = KEYWORDS;
 	dictionary["bool"] = KEYWORDS;
 	dictionary["int"] = KEYWORDS;
 	dictionary["END"] = KEYWORDS;
@@ -72,6 +75,7 @@ void StateMachine::Action() {
 		if (input[i] == '\n')
 			++currentLine;
 
+		// maybe need refactor
 		if (input[i] == '"')
 			isString = !isString;
 
@@ -123,6 +127,11 @@ bool StateMachine::TryCheckToken(std::string tokenStr) {
 			case KEYWORDS:
 				token.SetName("keyword");
 				
+				if (tokenStr == "FUNC")
+					isFunc = true;
+				else
+					isFunc = false;
+
 				token.SetCodeData(tokenStr);
 				token.SetLine(currentLine);
 				break;
@@ -173,13 +182,26 @@ bool StateMachine::TryCheckToken(std::string tokenStr) {
 				id = tok.GetValue();
 			}
 
+		if (isFunc && funcTable.find(tokenStr) == funcTable.end()) {
+			funcTable[tokenStr] = std::to_string(++funcID);
+			token.SetValue(std::to_string(funcID));
+			isFunc = false;
+
+			return true;
+		}
+
 		if (search)
 			token.SetValue(id);
 		else {
-			if (IsId(tokenStr))
+			if (IsId(tokenStr)) {
 				token.SetValue(std::to_string(++uniqID));
-			else 
+				if(funcTable.find(tokenStr) == funcTable.end())
+					idTable[tokenStr] = std::to_string(uniqID);
+			}
+			else {
 				token.SetValue(std::to_string(++constNumID));
+				valTable[tokenStr] = std::to_string(constNumID);
+			}
 		}
 
 		currentState = GETCHAR;
@@ -249,3 +271,14 @@ bool StateMachine::IsId(std::string data) {
 	return false;
 }
 
+std::map<std::string, std::string>& StateMachine::GetMapId() {
+	return idTable;
+}
+
+std::map<std::string, std::string>& StateMachine::GetMapVal() {
+	return valTable;
+}
+
+std::map<std::string, std::string>& StateMachine::GetMapFunc() {
+	return funcTable;
+}

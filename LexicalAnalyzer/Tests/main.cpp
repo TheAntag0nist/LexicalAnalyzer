@@ -1,4 +1,6 @@
 PROGRAMM; 
+  FUNC valstr (string s); 
+
   integer x; 
   bool y; 
   string z; 

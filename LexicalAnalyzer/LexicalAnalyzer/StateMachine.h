@@ -20,13 +20,17 @@ private:
 	int currentLine;
 
 	bool isString;
+	bool isFunc;
 
 	std::map<std::string, TOKENS_CLASS> dictionary;
+	std::list<Token>* result;
 
-	std::list<std::string> alphabet;
-	std::list<Token>* result; 
+	std::map<std::string, std::string> idTable;
+	std::map<std::string, std::string> valTable;
+	std::map<std::string, std::string> funcTable;
 
 	static int uniqID;
+	static int funcID;
 	static int constNumID;
 
 public:
@@ -47,6 +51,10 @@ public:
 
 	bool IsNumber(std::string data);
 	bool IsId(std::string data);
+
+	std::map<std::string, std::string>& GetMapId();
+	std::map<std::string, std::string>& GetMapVal();
+	std::map<std::string, std::string>& GetMapFunc();
 
 };
 

@@ -23,6 +23,8 @@ private:
 	std::list<std::string> indentifier;
 	std::list<std::string> constants;
 
+	StateMachine machine;
+
 public:
 	Parser();
 	~Parser();
