@@ -1,36 +1,50 @@
 #include "StateMachine.h"
 
+int StateMachine::uniqID = 0;
+int StateMachine::constNumID = 0;
+
 StateMachine::StateMachine() : currentState(GETCHAR), currentLine(1) {
-	keywords["EXITWHILE"] = KEYWORDS;
-	keywords["ENDWHILE"] = KEYWORDS;
-	keywords["PROGRAMM"] = KEYWORDS;
-	keywords["integer"] = KEYWORDS;
-	keywords["string"] = KEYWORDS;
-	keywords["WHILE"] = KEYWORDS;
-	keywords["endif"] = KEYWORDS;
-	keywords["else"] = KEYWORDS;
-	keywords["FUNC"] = KEYWORDS;
-	keywords["ENDF"] = KEYWORDS;
-	keywords["bool"] = KEYWORDS;
-	keywords["int"] = KEYWORDS;
-	keywords["END"] = KEYWORDS;
-	keywords["DO"] = KEYWORDS;
-	keywords["if"] = KEYWORDS;
+	isString = false;
 
-	modifiers["CONST"] = MODIFIER;
-	modifiers["const"] = MODIFIER;
+	dictionary["EXITWHILE"] = KEYWORDS;
+	dictionary["ENDWHILE"] = KEYWORDS;
+	dictionary["PROGRAMM"] = KEYWORDS;
+	dictionary["integer"] = KEYWORDS;
+	dictionary["string"] = KEYWORDS;
+	dictionary["WHILE"] = KEYWORDS;
+	dictionary["endif"] = KEYWORDS;
+	dictionary["else"] = KEYWORDS;
+	dictionary["FUNC"] = KEYWORDS;
+	dictionary["ENDF"] = KEYWORDS;
+	dictionary["bool"] = KEYWORDS;
+	dictionary["int"] = KEYWORDS;
+	dictionary["END"] = KEYWORDS;
+	dictionary["DO"] = KEYWORDS;
+	dictionary["if"] = KEYWORDS;
+
+	dictionary["CONST"] = MODIFIER;
+	dictionary["const"] = MODIFIER;
 	
-	delimiters["'"]  = DELIMITERS;
-	delimiters["\""] = DELIMITERS;
-	delimiters[" "]  = DELIMITERS;
-	delimiters[";"]  = DELIMITERS;	
-	delimiters[" "] = DELIMITERS;
+	dictionary["'"]  = DELIMITERS;
+	dictionary[";"]  = DELIMITERS;	
+	dictionary[" "] = DELIMITERS;
+	dictionary["("] = DELIMITERS;
+	dictionary[")"] = DELIMITERS;
 
-	operators["+"] = OPERATORS;
-	operators["-"] = OPERATORS;
-	operators["/"] = OPERATORS;
-	operators["*"] = OPERATORS;
-	operators["="] = OPERATORS;
+	dictionary["+"] = OPERATORS;
+	dictionary["-"] = OPERATORS;
+	dictionary["/"] = OPERATORS;
+	dictionary["*"] = OPERATORS;
+	dictionary["="] = OPERATORS;
+	dictionary[">"] = OPERATORS;
+	dictionary["<"] = OPERATORS;
+	dictionary["<="] = OPERATORS;
+	dictionary[">="] = OPERATORS;
+	dictionary["=="] = OPERATORS;
+	dictionary["!="] = OPERATORS;
+	dictionary["["] = OPERATORS;
+	dictionary["]"] = OPERATORS;
+	dictionary["!"] = OPERATORS;
 }
 
 StateMachine::~StateMachine() {}
@@ -49,7 +63,6 @@ void StateMachine::SetState(int state) {
 
 void StateMachine::Action() {
 	std::string readData;
-	int state = GETCHAR;
 	
 	// action on current state
 	if (input == "")
@@ -59,12 +72,25 @@ void StateMachine::Action() {
 		if (input[i] == '\n')
 			++currentLine;
 
-		if (!IsChar(input[i]) && !IsDigit(input[i]) ||
-			IsDelimiter(input[i]) || IsOperator(input[i]))
+		if (input[i] == '"')
+			isString = !isString;
+
+		if (IsDelimiter(input[i]) || IsOperator(input[i]) && !isString)
 			currentState = DEFINETOKEN;
 
-		if (currentState == GETCHAR &&
-			(IsChar(input[i]) || IsDigit(input[i])))
+		if (IsOperator(input[i])) {
+			std::string temp(1, input[i]);
+			if (IsOperator(input[i + 1]))
+				temp += input[i + 1];
+
+			TryCheckToken(readData);
+			TryCheckToken(temp);
+
+			readData = "";
+			continue;
+		}
+
+		if (currentState == GETCHAR)
 			readData += input[i];
 
 		if (currentState == DEFINETOKEN) {
@@ -91,58 +117,70 @@ bool StateMachine::TryCheckToken(std::string tokenStr) {
 		return true;
 	}
 
-	if (keywords.find(tokenStr) != keywords.end()) {
+	if (dictionary.find(tokenStr) != dictionary.end()) {
 		// we found keyword
-		token.SetName("keyword");
-		token.SetCodeData(tokenStr);
-		token.SetLine(currentLine);
-
+		switch (dictionary[tokenStr]){
+			case KEYWORDS:
+				token.SetName("keyword");
+				
+				token.SetCodeData(tokenStr);
+				token.SetLine(currentLine);
+				break;
+			case OPERATORS:
+				token.SetName("operator");
+				
+				token.SetCodeData(tokenStr);
+				token.SetLine(currentLine);
+				break;
+			case DELIMITERS:
+				token.SetName("delimiter");
+				
+				token.SetCodeData(tokenStr);
+				token.SetLine(currentLine);
+				break;
+			case MODIFIER:
+				token.SetName("modifier");
+				token.SetValue("CONST");
+				
+				token.SetCodeData(tokenStr);
+				token.SetLine(currentLine);
+				break;
+			default:
+				break;
+		}
+		
 		currentState = GETCHAR;
 
 		result->push_back(token);
 		return true;
 	}
-	if (operators.find(tokenStr) != operators.end()) {
-		// we found operator		// we found keyword
-		token.SetName("operator");
+	// maybe need refactor
+	else if (IsId(tokenStr) || IsNumber(tokenStr)) {
+		bool search = false;
+		std::string id;
+
+		if (IsId(tokenStr))
+			token.SetName("ID");
+		else
+			token.SetName("CONSTVAL");
+
 		token.SetCodeData(tokenStr);
 		token.SetLine(currentLine);
 
-		currentState = GETCHAR;
+		for (auto tok : *result)
+			if (tok.GetCodeData() == token.GetCodeData()) {
+				search = true;
+				id = tok.GetValue();
+			}
 
-		result->push_back(token);
-		return true;
-	}
-	if (delimiters.find(tokenStr) != delimiters.end()) {
-		// we found delimiter
-		token.SetName("delimiter");
-		token.SetCodeData(tokenStr);
-		token.SetLine(currentLine);
-
-		currentState = GETCHAR;
-
-		result->push_back(token);
-		return true;
-	}
-	if (modifiers.find(tokenStr) != modifiers.end()) {
-		// we found modifiers
-		// only one variant in current version
-		token.SetName("modifier");
-		token.SetValue("CONST");
-		token.SetCodeData(tokenStr);
-		token.SetLine(currentLine);
-
-		currentState = GETCHAR;
-
-		result->push_back(token);
-		return true;
-	}
-	if (!IsNumber(tokenStr)) {
-		// we found indentifier
-		token.SetName("ID");
-		token.SetValue("test 42152");
-		token.SetCodeData(tokenStr);
-		token.SetLine(currentLine);
+		if (search)
+			token.SetValue(id);
+		else {
+			if (IsId(tokenStr))
+				token.SetValue(std::to_string(++uniqID));
+			else 
+				token.SetValue(std::to_string(++constNumID));
+		}
 
 		currentState = GETCHAR;
 
@@ -171,21 +209,21 @@ bool StateMachine::IsDigit(char ch) {
 }
 
 bool StateMachine::IsDelimiter(char ch) {
-	std::string delim = "";
-	delim = ch;
+	std::string delim(1, ch);
 
-	if (delimiters.find(delim) != delimiters.end())
-		return true;
+	if (dictionary.find(delim) != dictionary.end())
+		if(dictionary[delim] == DELIMITERS)
+			return true;
 
 	return false;
 }
 
 bool StateMachine::IsOperator(char ch) {
-	std::string oper = "";
-	oper = ch;
+	std::string oper(1, ch);
 
-	if (operators.find(oper) != operators.end())
-		return true;
+	if (dictionary.find(oper) != dictionary.end())
+		if (dictionary[oper] == OPERATORS)
+			return true;
 
 	return false;
 }
@@ -197,3 +235,17 @@ bool StateMachine::IsNumber(std::string data) {
 
 	return true;
 }
+
+
+bool StateMachine::IsId(std::string data) {
+	if ((data[0] == '_' || IsChar(data[0]))) {
+		for (int i = 0; i < data.length(); ++i)
+			if ((IsOperator(data[i]) || IsDelimiter(data[i])) && data[i] != '-')
+				return false;
+
+		return true;
+	}
+
+	return false;
+}
+

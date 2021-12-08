@@ -35,6 +35,9 @@ public:
 	std::string GetName();
 	std::string GetValue();
 
+	std::string GetCodeData();
+	int GetLine();
+
 	std::string GetToken();
 	std::string GetCodeInfo();
 

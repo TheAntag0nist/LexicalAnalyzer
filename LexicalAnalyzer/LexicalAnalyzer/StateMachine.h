@@ -19,13 +19,15 @@ private:
 	int currentState;
 	int currentLine;
 
-	std::map<std::string, TOKENS_CLASS> keywords;
-	std::map<std::string, TOKENS_CLASS> operators;
-	std::map<std::string, TOKENS_CLASS> modifiers;
-	std::map<std::string, TOKENS_CLASS> delimiters;
+	bool isString;
+
+	std::map<std::string, TOKENS_CLASS> dictionary;
 
 	std::list<std::string> alphabet;
-	std::list<Token>* result;
+	std::list<Token>* result; 
+
+	static int uniqID;
+	static int constNumID;
 
 public:
 	StateMachine();
@@ -44,6 +46,7 @@ public:
 	bool IsOperator(char ch);
 
 	bool IsNumber(std::string data);
+	bool IsId(std::string data);
 
 };
 

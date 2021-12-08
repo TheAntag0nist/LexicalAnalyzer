@@ -33,6 +33,14 @@ std::string Token::GetValue() {
 	return value;
 }
 
+std::string Token::GetCodeData() {
+	return codeData;
+}
+
+int Token::GetLine() {
+	return line;
+}
+
 std::string Token::GetToken() {
 	return ("< " + tokenName + ", " 
 				 + (value == "" ? "null" : value) + ">");
