@@ -209,6 +209,22 @@ bool StateMachine::TryCheckToken(std::string tokenStr) {
 		result->push_back(token);
 		return true;
 	}
+	else {
+		if (tokenStr[0] == '"') {
+			token.SetName("CONSTVAL");
+			token.SetValue(std::to_string(++uniqID));
+
+			token.SetCodeData(tokenStr);
+			token.SetLine(currentLine);
+
+			idTable[tokenStr.substr(1)] = std::to_string(uniqID);
+
+			currentState = GETCHAR;
+
+			result->push_back(token);
+			return true;
+		}
+	}
 
 	// meaybe we need more info
 	currentState = GETCHAR;
