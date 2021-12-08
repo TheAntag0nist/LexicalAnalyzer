@@ -217,7 +217,7 @@ bool StateMachine::TryCheckToken(std::string tokenStr) {
 			token.SetCodeData(tokenStr);
 			token.SetLine(currentLine);
 
-			idTable[tokenStr.substr(1)] = std::to_string(uniqID);
+			idTable[tokenStr] = std::to_string(uniqID);
 
 			currentState = GETCHAR;
 
