@@ -16,3 +16,4 @@ HEADERS += \
     AnalyzeExceprions.h
 
 
+DEFINES += "_DEBUG=true"

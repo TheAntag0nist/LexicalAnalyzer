@@ -12,7 +12,7 @@ int main() {
 	SetConsoleOutputCP(65001);
 
 	Parser analyzer;
-	string path = "C:\\";
+    string path = "";
 	string filename;
 
 	cout << "[ENT]:> Enter file for lexic analyze: ";

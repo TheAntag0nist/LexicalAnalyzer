@@ -79,7 +79,7 @@ void StateMachine::Action() {
 		if (input[i] == '"')
 			isString = !isString;
 
-		if (IsDelimiter(input[i]) || IsOperator(input[i]) && !isString)
+        if ((IsDelimiter(input[i]) || IsOperator(input[i])) && !isString)
 			currentState = DEFINETOKEN;
 
 		if (IsOperator(input[i])) {
@@ -212,12 +212,12 @@ bool StateMachine::TryCheckToken(std::string tokenStr) {
 	else {
 		if (tokenStr[0] == '"') {
 			token.SetName("CONSTVAL");
-			token.SetValue(std::to_string(++uniqID));
+            token.SetValue(std::to_string(++constNumID));
 
 			token.SetCodeData(tokenStr);
 			token.SetLine(currentLine);
 
-			idTable[tokenStr] = std::to_string(uniqID);
+            valTable[tokenStr] = std::to_string(constNumID);
 
 			currentState = GETCHAR;
 
@@ -267,9 +267,17 @@ bool StateMachine::IsOperator(char ch) {
 }
 
 bool StateMachine::IsNumber(std::string data) {
-	for (int i = 0; i < data.length(); ++i)
-		if (!IsDigit(data[i]))
+    int start = 0;
+    bool dot = true;
+    if (data[0] == '-') start = 1;
+    for (int i = start; i < data.length(); ++i) {
+        if (data[i] == '.' && dot) {
+            dot = false;
+            continue;
+        }
+        if (!IsDigit(data[i]))
 			return false;
+    }
 
 	return true;
 }
