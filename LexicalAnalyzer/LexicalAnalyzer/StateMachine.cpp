@@ -13,6 +13,7 @@ StateMachine::StateMachine() : currentState(GETCHAR), currentLine(1) {
 	dictionary["PROGRAMM"] = KEYWORDS;
 	dictionary["integer"] = KEYWORDS;
 	dictionary["string"] = KEYWORDS;
+	dictionary["return"] = KEYWORDS;
 	dictionary["WHILE"] = KEYWORDS;
 	dictionary["endif"] = KEYWORDS;
 	dictionary["else"] = KEYWORDS;
@@ -33,6 +34,8 @@ StateMachine::StateMachine() : currentState(GETCHAR), currentLine(1) {
 	dictionary[" "] = DELIMITERS;
 	dictionary["("] = DELIMITERS;
 	dictionary[")"] = DELIMITERS;
+	dictionary["."] = DELIMITERS;
+	dictionary["\t"] = DELIMITERS;
 
 	dictionary["+"] = OPERATORS;
 	dictionary["-"] = OPERATORS;
@@ -72,8 +75,10 @@ void StateMachine::Action() {
 		throw StateMachineException("sequence of input characters can't be null");
 
 	for (int i = 0; i < input.length(); ++i) {
-		if (input[i] == '\n')
+		if (input[i] == '\n') {
 			++currentLine;
+			continue;
+		}
 
 		// maybe need refactor
 		if (input[i] == '"')
@@ -105,6 +110,7 @@ void StateMachine::Action() {
 				throw StateMachineException("Unknown lexic on line -> "
 					+ std::to_string(currentLine) + " :: lexic -> " + readData);
 #endif
+
 			readData = "";
 		}
 	}
