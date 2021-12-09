@@ -189,6 +189,11 @@ bool StateMachine::TryCheckToken(std::string tokenStr) {
 
 			return true;
 		}
+		else if (funcTable.find(tokenStr) != funcTable.end()) {
+			currentState = GETCHAR;
+			result->push_back(token);
+			return true;
+		}
 
 		if (search)
 			token.SetValue(id);
