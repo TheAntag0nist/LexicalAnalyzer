@@ -6,6 +6,8 @@ PROGRAMM;
   string z; 
   z="www";
   
+  fagdsdgdd93502gf&^*&%*hd
+  
   WHILE 1 
    DO 
     x=x-1; 

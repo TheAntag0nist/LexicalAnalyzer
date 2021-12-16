@@ -1,6 +1,7 @@
 #ifndef STATE_MACHINE_H
 #define STATE_MACHINE_H
 
+#include <iostream>
 #include <vector>
 #include <list>
 #include <map>

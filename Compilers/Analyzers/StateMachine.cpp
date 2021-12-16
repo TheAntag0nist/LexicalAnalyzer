@@ -306,8 +306,10 @@ bool StateMachine::IsNumber(std::string data) {
 
 bool StateMachine::IsId(std::string data) {
 	if ((data[0] == '_' || IsChar(data[0]))) {
-		for (int i = 0; i < data.length(); ++i)
+		for (int i = 0; i < data.size(); ++i)
 			if ((IsOperator(data[i]) || IsDelimiter(data[i])) && data[i] != '-')
+				return false;
+			else if (!IsChar(data[i]) && !IsDigit(data[i]))
 				return false;
 
 		return true;
