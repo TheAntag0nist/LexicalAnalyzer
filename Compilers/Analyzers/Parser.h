@@ -12,6 +12,7 @@
 #include <list>
 
 #include "AnalyzeExceprions.h"
+#include "SyntaxAnalyzer.h"
 #include "StateMachine.h"
 #include "Token.h"
 
@@ -24,6 +25,7 @@ private:
 	std::list<std::string> constants;
 
 	StateMachine machine;
+	Syntax syntax;
 
 public:
 	Parser();

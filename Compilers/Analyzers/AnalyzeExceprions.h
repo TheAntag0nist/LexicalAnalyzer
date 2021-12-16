@@ -30,4 +30,17 @@ public:
 
 };
 
+class SyntaxException : public std::exception {
+private:
+	std::string msg;
+
+public:
+	SyntaxException(const std::string& msg) : msg(msg) {}
+
+	virtual const char* what() const noexcept override {
+		return msg.c_str();
+	}
+
+};
+
 #endif

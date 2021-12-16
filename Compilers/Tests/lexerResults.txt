@@ -1,0 +1,119 @@
+              < FUNC, 1>                < keyword, FUNC>
+            < valstr, 1>                        < ID, 1>
+                 < (, 1>                 < delimiter, (>
+            < string, 1>              < keyword, string>
+                 < s, 1>                        < ID, 1>
+                 < ), 1>                 < delimiter, )>
+                 < ;, 1>                 < delimiter, ;>
+          < PROGRAMM, 3>            < keyword, PROGRAMM>
+                 < ;, 3>                 < delimiter, ;>
+           < integer, 4>             < keyword, integer>
+                 < x, 4>                        < ID, 2>
+                 < ;, 4>                 < delimiter, ;>
+              < bool, 5>                < keyword, bool>
+                 < y, 5>                        < ID, 3>
+                 < ;, 5>                 < delimiter, ;>
+            < string, 6>              < keyword, string>
+                 < z, 6>                        < ID, 4>
+                 < ;, 6>                 < delimiter, ;>
+                 < z, 7>                        < ID, 4>
+                 < =, 7>                  < operator, =>
+             < "www", 7>                  < CONSTVAL, 1>
+                 < ;, 7>                 < delimiter, ;>
+             < WHILE, 9>               < keyword, WHILE>
+                 < 1, 9>                  < CONSTVAL, 2>
+               < DO, 10>                  < keyword, DO>
+                < x, 11>                        < ID, 2>
+                < =, 11>                  < operator, =>
+                < x, 11>                        < ID, 2>
+                < -, 11>                  < operator, ->
+                < 1, 11>                  < CONSTVAL, 2>
+                < ;, 11>                 < delimiter, ;>
+               < if, 13>                  < keyword, if>
+                < x, 13>                        < ID, 2>
+                < =, 13>                  < operator, =>
+                < 5, 13>                  < CONSTVAL, 3>
+             < then, 13>                < keyword, then>
+                < y, 13>                        < ID, 3>
+                < =, 13>                  < operator, =>
+                < (, 13>                 < delimiter, (>
+           < valstr, 13>                        < ID, 1>
+                < (, 13>                 < delimiter, (>
+                < z, 13>                        < ID, 4>
+                < ), 13>                 < delimiter, )>
+                < >, 13>                  < operator, >>
+               < 15, 13>                  < CONSTVAL, 4>
+                < ), 13>                 < delimiter, )>
+                < ;, 13>                 < delimiter, ;>
+        < EXITWHILE, 14>           < keyword, EXITWHILE>
+                < ;, 14>                 < delimiter, ;>
+             < else, 15>                < keyword, else>
+                < y, 15>                        < ID, 3>
+                < =, 15>                  < operator, =>
+                < (, 15>                 < delimiter, (>
+           < valstr, 15>                        < ID, 1>
+                < (, 15>                 < delimiter, (>
+                < z, 15>                        < ID, 4>
+                < ), 15>                 < delimiter, )>
+                < <, 15>                  < operator, <>
+               < 15, 15>                  < CONSTVAL, 4>
+                < ), 15>                 < delimiter, )>
+            < endif, 15>               < keyword, endif>
+                < ;, 15>                 < delimiter, ;>
+         < ENDWHILE, 16>            < keyword, ENDWHILE>
+                < ;, 16>                 < delimiter, ;>
+              < END, 17>                 < keyword, END>
+                < ., 17>                 < delimiter, .>
+             < FUNC, 19>                < keyword, FUNC>
+           < valstr, 19>                        < ID, 1>
+                < (, 19>                 < delimiter, (>
+           < string, 19>              < keyword, string>
+                < s, 19>                        < ID, 1>
+                < ), 19>                 < delimiter, )>
+                < ;, 19>                 < delimiter, ;>
+              < int, 20>                 < keyword, int>
+              < pos, 20>                        < ID, 5>
+                < ;, 20>                 < delimiter, ;>
+              < pos, 21>                        < ID, 5>
+                < =, 21>                  < operator, =>
+                < 0, 21>                  < CONSTVAL, 5>
+                < ;, 21>                 < delimiter, ;>
+            < WHILE, 23>               < keyword, WHILE>
+                < s, 23>                        < ID, 1>
+                < [, 23>                  < operator, [>
+              < pos, 23>                        < ID, 5>
+                < ], 23>                  < operator, ]>
+               < !=, 23>                 < operator, !=>
+                < ', 23>                 < delimiter, '>
+               < \0, 23>                  < CONSTVAL, 6>
+                < ', 23>                 < delimiter, '>
+               < DO, 23>                  < keyword, DO>
+              < pos, 24>                        < ID, 5>
+                < =, 24>                  < operator, =>
+              < pos, 24>                        < ID, 5>
+                < +, 24>                  < operator, +>
+                < 1, 24>                  < CONSTVAL, 2>
+                < ;, 24>                 < delimiter, ;>
+         < ENDWHILE, 25>            < keyword, ENDWHILE>
+                < ;, 25>                 < delimiter, ;>
+           < return, 27>              < keyword, return>
+              < pos, 27>                        < ID, 5>
+                < ;, 27>                 < delimiter, ;>
+             < ENDF, 28>                < keyword, ENDF>
+                < ;, 28>                 < delimiter, ;>
+[INF]:> ID table:
+                       0                             pos               5
+                       1                               s               1
+                       2                               x               2
+                       3                               y               3
+                       4                               z               4
+[INF]:> CONST VALUE table:
+                       0                           "www"               1
+                       1                               0               5
+                       2                               1               2
+                       3                              15               4
+                       4                               5               3
+                       5                              \0               6
+[INF]:> FUNC table:
+                       0                          valstr               1
+[INF]:> END WORK;

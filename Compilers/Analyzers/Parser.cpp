@@ -40,6 +40,7 @@ void Parser::Analyze() {
 	machine.SetResultList(&tokens);
 
 	machine.Action();
+	syntax.Action(machine, &tokens);
 }
 
 void Parser::DisplayResults() {
