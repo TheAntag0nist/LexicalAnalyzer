@@ -51,6 +51,10 @@ StateMachine::StateMachine() : currentState(GETCHAR), currentLine(1) {
 	dictionary["["] = OPERATORS;
 	dictionary["]"] = OPERATORS;
 	dictionary["!"] = OPERATORS;
+
+	special.push_back("\\0");
+	special.push_back("\\t");
+	special.push_back("\\n");
 }
 
 StateMachine::~StateMachine() {}
@@ -90,7 +94,7 @@ void StateMachine::Action() {
 		if (IsOperator(input[i])) {
 			std::string temp(1, input[i]);
 			if (IsOperator(input[i + 1]))
-				temp += input[i + 1];
+				temp += input[++i];
 
 			TryCheckToken(readData);
 			TryCheckToken(temp);
@@ -103,15 +107,13 @@ void StateMachine::Action() {
 			readData += input[i];
 
 		if (currentState == DEFINETOKEN) {
-#ifdef _DEBUG
-			TryCheckToken(readData);
-			if (IsDelimiter(input[i]))
-				TryCheckToken(std::string(1,input[i]));
-#elif NDEBUG 
 			if (!TryCheckToken(readData))
-				throw StateMachineException("Unknown lexic on line -> "
+				throw StateMachineException("lexic:> Unknown lexic on line -> "
 					+ std::to_string(currentLine) + " :: lexic -> " + readData);
-#endif
+			if (input[i] != ' ' && input[i] != '\t' && IsDelimiter(input[i]))
+				if (!TryCheckToken(std::string(1, input[i])))
+					throw StateMachineException("lexic:> Unknown lexic on line -> "
+						+ std::to_string(currentLine) + " :: lexic -> " + input[i]);
 
 			readData = "";
 		}
@@ -153,6 +155,7 @@ bool StateMachine::TryCheckToken(std::string tokenStr) {
 				break;
 			case DELIMITERS:
 				token.SetName("delimiter");
+				token.SetValue(tokenStr);
 				
 				token.SetCodeData(tokenStr);
 				token.SetLine(currentLine);
@@ -190,11 +193,14 @@ bool StateMachine::TryCheckToken(std::string tokenStr) {
 			if (tok.GetCodeData() == token.GetCodeData()) {
 				search = true;
 				id = tok.GetValue();
+				token.SetValue(id);
+				token.SetType(tok.GetType());
 			}
 
 		if (isFunc && funcTable.find(tokenStr) == funcTable.end()) {
 			funcTable[tokenStr] = std::to_string(++funcID);
 			token.SetValue(std::to_string(funcID));
+			result->push_back(token);
 			isFunc = false;
 
 			return true;
@@ -206,13 +212,13 @@ bool StateMachine::TryCheckToken(std::string tokenStr) {
 			return true;
 		}
 
-		if (search)
-			token.SetValue(id);
-		else {
+		if(!search) {
 			if (IsId(tokenStr)) {
 				token.SetValue(std::to_string(++uniqID));
-				if(funcTable.find(tokenStr) == funcTable.end())
+				if (funcTable.find(tokenStr) == funcTable.end()) {
+					token.SetType((*(--result->end())).GetValue());
 					idTable[tokenStr] = std::to_string(uniqID);
+				}
 			}
 			else {
 				token.SetValue(std::to_string(++constNumID));
@@ -226,7 +232,7 @@ bool StateMachine::TryCheckToken(std::string tokenStr) {
 		return true;
 	}
 	else {
-		if (tokenStr[0] == '"') {
+		if (tokenStr[0] == '"' || IsSpecial(tokenStr)) {
 			token.SetName("CONSTVAL");
             token.SetValue(std::to_string(++constNumID));
 
@@ -242,7 +248,6 @@ bool StateMachine::TryCheckToken(std::string tokenStr) {
 		}
 	}
 
-	// meaybe we need more info
 	currentState = GETCHAR;
 	return false;
 }
@@ -307,6 +312,14 @@ bool StateMachine::IsId(std::string data) {
 
 		return true;
 	}
+
+	return false;
+}
+
+bool StateMachine::IsSpecial(std::string str) {
+	for (int i = 0; i < special.size(); ++i)
+		if (special[i] == str)
+			return true;
 
 	return false;
 }

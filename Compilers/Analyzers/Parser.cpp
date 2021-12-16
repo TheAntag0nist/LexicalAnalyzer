@@ -51,38 +51,41 @@ void Parser::DisplayResults() {
 	// display header
 	for(auto token : tokens){
 		std::cout << std::setw(24) << token.GetCodeInfo() << "\t"
-				  << std::setw(16) << token.GetToken() << std::endl;
+				  << std::setw(24) << token.GetToken() << std::endl;
 	}
 
 	auto mapId = machine.GetMapId();
 	auto mapVal = machine.GetMapVal();
 	auto mapFunc = machine.GetMapFunc();
 
-	std::cout << "[INF]:> ID table: " << std::endl;
+	if(mapId.size() > 0)
+		std::cout << "[INF]:> ID table: " << std::endl;
+	counter = 0;
 	for (auto it = mapId.begin(); it != mapId.end(); ++it) {
 		std::cout << std::setw(24) << counter << "\t"
-			<< std::setw(16) << it->first << std::setw(16) << it->second
+			<< std::setw(24) << it->first << std::setw(16) << it->second
 			<< std::endl;
 
 		++counter;
 	}
 
-	std::cout << "[INF]:> CONST VALUE table: " << std::endl;
+	if(mapVal.size() > 0)
+		std::cout << "[INF]:> CONST VALUE table: " << std::endl;
 	counter = 0;
 	for (auto it = mapVal.begin(); it != mapVal.end(); ++it) {
 		std::cout << std::setw(24) << counter << "\t"
-			<< std::setw(16) << it->first << std::setw(16) << it->second
+			<< std::setw(24) << it->first << std::setw(16) << it->second
 			<< std::endl;
 
 		++counter;
 	}
 
-
-	std::cout << "[INF]:> FUNC table: " << std::endl;
+	if(mapFunc.size() > 0)
+		std::cout << "[INF]:> FUNC table: " << std::endl;
 	counter = 0;
 	for (auto it = mapFunc.begin(); it != mapFunc.end(); ++it) {
 		std::cout << std::setw(24) << counter << "\t"
-			<< std::setw(16) << it->first << std::setw(16) << it->second
+			<< std::setw(24) << it->first << std::setw(16) << it->second
 			<< std::endl;
 
 		++counter;

@@ -1,6 +1,7 @@
 #ifndef STATE_MACHINE_H
 #define STATE_MACHINE_H
 
+#include <vector>
 #include <list>
 #include <map>
 
@@ -23,6 +24,7 @@ private:
 	bool isFunc;
 
 	std::map<std::string, TOKENS_CLASS> dictionary;
+	std::vector<std::string> special;
 	std::list<Token>* result;
 
 	std::map<std::string, std::string> idTable;
@@ -48,6 +50,7 @@ public:
 	bool IsDigit(char ch);
 	bool IsDelimiter(char ch);
 	bool IsOperator(char ch);
+	bool IsSpecial(std::string str);
 
 	bool IsNumber(std::string data);
 	bool IsId(std::string data);

@@ -17,6 +17,10 @@ void Token::SetValue(std::string value) {
 	this->value = value;
 }
 
+void Token::SetType(std::string type) {
+	this->type = type;
+}
+
 void Token::SetCodeData(std::string data) {
 	this->codeData = data;
 }
@@ -31,6 +35,10 @@ std::string Token::GetName() {
 
 std::string Token::GetValue() {
 	return value;
+}
+
+std::string Token::GetType() {
+	return this->type;
 }
 
 std::string Token::GetCodeData() {

@@ -1,7 +1,7 @@
-PROGRAMM; 
-  FUNC valstr (string s); 
+FUNC valstr (string s); 
 
-  integer x; 
+PROGRAMM; 
+  integer x;
   bool y; 
   string z; 
   z="www";
@@ -14,15 +14,15 @@ PROGRAMM;
 		EXITWHILE; 
     else y=( valstr (z)<15) endif; 
   ENDWHILE; 
- 
-  FUNC valstr (string s); 
-        int pos; 
-        pos = 0;
-		
-        WHILE s[pos] != '\0' DO 
-             pos = pos + 1; 
-        ENDWHILE; 
-        
-		return pos; 
-	ENDF; 
 END.
+
+FUNC valstr (string s); 
+    int pos; 
+    pos = 0;
+		
+    WHILE s[pos] != '\0' DO 
+        pos = pos + 1; 
+    ENDWHILE; 
+        
+	return pos; 
+ENDF; 
