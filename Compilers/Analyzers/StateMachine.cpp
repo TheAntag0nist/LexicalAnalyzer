@@ -183,9 +183,10 @@ bool StateMachine::TryCheckToken(std::string tokenStr) {
 
 		if (IsId(tokenStr))
 			token.SetName("ID");
-		else
+		else {
 			token.SetName("CONSTVAL");
-
+			token.SetType("integer");
+		}
 		token.SetCodeData(tokenStr);
 		token.SetLine(currentLine);
 
@@ -235,6 +236,12 @@ bool StateMachine::TryCheckToken(std::string tokenStr) {
 		if (tokenStr[0] == '"' || IsSpecial(tokenStr)) {
 			token.SetName("CONSTVAL");
             token.SetValue(std::to_string(++constNumID));
+
+			auto it = result->end();
+			if (tokenStr[0] == '"')
+				token.SetType("string");
+			else if((--it)->GetValue() == "bool")
+				token.SetType("bool");
 
 			token.SetCodeData(tokenStr);
 			token.SetLine(currentLine);

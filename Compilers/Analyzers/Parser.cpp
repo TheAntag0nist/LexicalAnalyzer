@@ -39,6 +39,8 @@ void Parser::Analyze() {
 	machine.SetInput(data);
 	machine.SetResultList(&tokens);
 
+	DisplayResults();
+
 	machine.Action();
 	syntax.Action(machine, &tokens);
 }

@@ -20,10 +20,9 @@ typedef struct Node{
 } Node;
 
 class AST {
-private:
+public:
 	Node root;
 
-public:
 	AST() {}
 	~AST() {}
 
@@ -33,7 +32,11 @@ class Syntax {
 private:
 	std::list<Token>* lexems;
 	std::list<Token>::iterator lexIter;
+	
+	// main code
 	AST tree;
+	// functions
+	std::list<AST> functions;
 
 	void S();
 
@@ -46,6 +49,14 @@ private:
 	void IO();
 	void SEQUENCES();
 	void RETURN();
+
+	void EXPRESSION(Token leftId);
+	void CONSTRUCTION();
+	
+	void CONDITION();
+
+	void IF();
+	void WHILE();
 
 public:
 	void Action(StateMachine& machine, std::list<Token>* lexs);

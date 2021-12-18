@@ -23,9 +23,6 @@ int main() {
 		analyzer.ReadFile( path + filename);
 		// analyze
 		analyzer.Analyze();
-		// display messages
-		// only in debug
-		analyzer.DisplayResults();
 	}
 	catch (std::exception& ex) {
 		cout << "[ERR]:> " << ex.what() << endl;
