@@ -1,5 +1,25 @@
 #include "SyntaxAnalyzer.h"
 
+void graph::addvertex(const string& name)
+{
+	vmap::iterator itr = work.find(name);
+	if (itr == work.end())
+	{
+		vertex* v;
+		v = new vertex(name);
+		work[name] = v;
+		return;
+	}
+	cout << "\nVertex already exists!";
+}
+void graph::addedge(const string& from, const string& to, double cost)
+{
+	vertex* f = (work.find(from)->second);
+	vertex* t = (work.find(to)->second);
+	pair<int, vertex*> edge = make_pair(cost, t);
+	f->adj.push_back(edge);
+}
+
 void Syntax::Action(StateMachine& machine, 
 	std::list<Token>* lexs) {
 	lexems = lexs;
@@ -9,6 +29,7 @@ void Syntax::Action(StateMachine& machine,
 void Syntax::S() {
 	lexIter = lexems->begin();
 	// create root node for AST
+	tree.addvertex("S");
 
 	while (lexIter->GetName() == "keyword" &&
 		lexIter->GetValue() == "FUNC")
@@ -92,23 +113,30 @@ void Syntax::PROGRAM() {
 	else
 		throw SyntaxException("syntax:> type error: line -> " +
 			std::to_string(currentToken.GetLine()) + " lexem -> " + currentToken.GetValue());
+
+	tree.addvertex("PROGRAM");
+	tree.addedge("S", "PROGRAM");
 }
 
 void Syntax::FUNC() {
 	Token currentToken = *lexIter;
 
 	// create func tree as a separate
-	AST funcAST;
+	graph funcAST;
 
 	// create AST
 
+	functions.push_back(funcAST);
 	++lexIter;
 }
 
-void Syntax::RPOGRAM_BODY() {
+void Syntax::RPOGRAM_BODY(bool inner) {
 	++lexIter;
 
 	std::cout << "syntax_stage:> success -> start program body;\n";
+
+	if(lexIter->GetValue() == "endif" || 
+		lexIter->GetValue() == "ENDWHILE")
 
 	// not nessacary
 	// program can be without arguments
@@ -121,15 +149,15 @@ void Syntax::RPOGRAM_BODY() {
 
 	std::cout << "syntax_stage:> success -> success all read IOs;\n";
 
-	SEQUENCES();
+	sequencesFlag = true;
+	while(sequencesFlag)
+		SEQUENCES();
 
 	std::cout << "syntax_stage:> success -> read body;\n";
 
 	// not necessary part
-	RETURN();
-
-	// not necessary part
-	FUNC();
+	if(inner)
+		FUNC();
 }
 
 void Syntax::IO() {
@@ -178,14 +206,18 @@ void Syntax::IO() {
 			std::to_string(currentToken.GetLine()) + " lexem -> " + currentToken.GetValue());
 
 	std::cout << "syntax_stage:> success -> read IO;\n";
-	++lexIter;
 }
 
 void Syntax::SEQUENCES() {
 	Token currentToken = *lexIter;
 
-	// start working on sequences
+	if (currentToken.GetValue() == "END") {
+		sequencesFlag = false;
+		return;
+	}
 
+	// start working on sequences
+	CONSTRUCTION();
 
 	++lexIter;
 }
@@ -195,6 +227,13 @@ void Syntax::RETURN() {
 
 	// return data
 	// just search END. token
+	if (currentToken.GetName() == "keyword" ||
+		currentToken.GetValue() == "END." || 
+		currentToken.GetValue() == "ENDF" ||
+		currentToken.GetValue() == "ENDWHILE" || 
+		currentToken.GetValue() == "endif") {
+		std::cout << "syntax_stage:> success -> find END.;\n";
+	}
 
 	++lexIter;
 }
@@ -202,23 +241,50 @@ void Syntax::RETURN() {
 void Syntax::EXPRESSION(Token leftId) {
 	std::list<Token> expression;
 	std::string leftIdType = leftId.GetType();
+	bool boolExpression = false;
 
-	while (lexIter->GetName() != "delimiter" &&
+	++lexIter;
+	while ((lexIter->GetName() != "delimiter" && 
+		lexIter->GetName() != "keyword") &&
 		lexIter != lexems->end()) {
 		expression.push_back(*lexIter);
 
+		if (lexIter->GetName() == "operator" ||
+			lexIter->GetValue() == ">" ||
+			lexIter->GetValue() == "<" ||
+			lexIter->GetValue() == ">=" ||
+			lexIter->GetValue() == "<=" ||
+			lexIter->GetValue() == "==" ||
+			lexIter->GetValue() == "!=")
+			boolExpression = true;
+
 		++lexIter;
+	}
+
+	bool ignoreFlag = boolExpression ? false : true;;
+	if (leftIdType == "bool") {
+		ignoreFlag = true;
 	}
 
 	if (lexIter == lexems->end())
 		throw SyntaxException("syntax:> error: not find delimiter;");
 
+
+	bool first = true;
 	bool idOperatorFlag = true;
-	for (auto it = ++expression.begin(); it != expression.end(); ++it) {
+	for (auto it = expression.begin(); it != expression.end(); ++it) {
+		if (first) {
+			first = false;
+			if (it->GetName() == "operator")
+				idOperatorFlag = false;
+		}
+		
 		if (idOperatorFlag) {
 			idOperatorFlag = false;
 			if (it->GetName() == "ID" || it->GetName() == "CONSTVAL") {
-				if (it->GetType() != leftIdType)
+				if (it->GetType() != leftIdType && ((leftIdType != "bool" &&
+					it->GetType() == "integer") || (leftIdType != "integer" &&
+						it->GetType() == "bool")))
 					throw SyntaxException("syntax:> error invalid types: line -> " +
 						std::to_string(it->GetLine()) + " lexem -> " + it->GetValue() +
 						" left id type -> " + leftIdType +
@@ -232,8 +298,9 @@ void Syntax::EXPRESSION(Token leftId) {
 		}
 		else if (!idOperatorFlag) {
 			idOperatorFlag = true;
-			if(it->GetName() == "operator"){
+			if(it->GetName() == "operator" || it->GetName() == "keyword") {
 				// convert to ast
+				tree.addvertex(it->GetValue());
 			}
 			else
 				throw SyntaxException("syntax:> need operator: line -> " +
@@ -248,7 +315,6 @@ void Syntax::EXPRESSION(Token leftId) {
 }
 
 void Syntax::CONSTRUCTION() {
-	++lexIter;
 	Token currentToken = *lexIter;
 
 	if (currentToken.GetName() == "keyword") {
@@ -257,4 +323,36 @@ void Syntax::CONSTRUCTION() {
 		if (currentToken.GetValue() == "if")
 			IF();
 	}
+}
+
+void Syntax::IF() {
+	CONDITION();
+
+	RPOGRAM_BODY(true);
+}
+
+void Syntax::WHILE() {
+	whileFlag = true;
+
+	std::cout << "syntax_stage:> success -> read WHILE;\n";
+
+	tempGlobalToken.SetName("ID");
+	tempGlobalToken.SetValue("temp");
+	tempGlobalToken.SetType("bool");
+
+	CONDITION();
+
+	std::cout << "syntax_stage:> success -> read CONDITION;\n";
+
+	if (lexIter->GetName() == "keyword" &&
+		lexIter->GetValue() == "DO")
+		RPOGRAM_BODY(true);
+	else
+		throw SyntaxException("syntax:> error: line -> " +
+			std::to_string(lexIter->GetLine()) + " lexem -> " + lexIter->GetValue());
+}
+
+// it's just expression with bool type
+void Syntax::CONDITION() {
+	EXPRESSION(tempGlobalToken);
 }
