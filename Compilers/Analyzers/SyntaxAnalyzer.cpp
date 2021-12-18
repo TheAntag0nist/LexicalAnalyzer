@@ -48,6 +48,8 @@ void Syntax::PROTOTYPE() {
 	bool type = false;
 	char braceFlag = 0;
 
+	tree.addvertex("PROTOTYPE");
+
 	if (currentToken.GetName() == "ID") {
 		funcID = true;
 	}
@@ -62,6 +64,9 @@ void Syntax::PROTOTYPE() {
 	else
 		throw SyntaxException("syntax:> error: line -> " +
 			std::to_string(currentToken.GetLine()) + " lexem -> " + currentToken.GetValue());
+
+	tree.addvertex(currentToken.GetValue());
+	tree.addedge("PROTOTYPE", currentToken.GetValue());
 
 	++lexIter;
 	while (lexIter != lexems->end()) {
@@ -135,17 +140,20 @@ void Syntax::RPOGRAM_BODY(bool inner) {
 
 	std::cout << "syntax_stage:> success -> start program body;\n";
 
-	if(lexIter->GetValue() == "endif" || 
+	if (lexIter->GetValue() == "endif" ||
 		lexIter->GetValue() == "ENDWHILE")
+		return;
 
 	// not nessacary
 	// program can be without arguments
-	while((lexIter->GetName() == "keyword") &&
+	while ((lexIter->GetName() == "keyword") &&
 		(lexIter->GetValue() == "string" ||
-		 lexIter->GetValue() == "integer" ||
-		 lexIter->GetValue() == "bool") ||
-		lexIter->GetName() == "ID")
+			lexIter->GetValue() == "integer" ||
+			lexIter->GetValue() == "bool") ||
+		lexIter->GetName() == "ID") {
 		IO();
+		++lexIter;
+	}
 
 	std::cout << "syntax_stage:> success -> success all read IOs;\n";
 
@@ -277,6 +285,12 @@ void Syntax::EXPRESSION(Token leftId) {
 			first = false;
 			if (it->GetName() == "operator")
 				idOperatorFlag = false;
+		}
+
+		if (it->GetValue() == "(" ||
+			it->GetValue() == ")") {
+			++lexIter;
+			continue;
 		}
 		
 		if (idOperatorFlag) {
