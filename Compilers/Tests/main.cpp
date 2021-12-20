@@ -4,15 +4,15 @@ PROGRAMM;
   integer x;
   bool y; 
   string z; 
-  z="www" + 10;
+  z="www";
   
   WHILE 1 
    DO 
     x=x-1; 
     
-    if x=5 then y= valstr > 15;  
+    if x=5 then y= valstr(z) > 15;  
 		EXITWHILE; 
-    else y= valstr <15 endif; 
+    else y= valstr(z) <15 endif; 
   ENDWHILE; 
 END.
 
