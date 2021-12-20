@@ -29,8 +29,9 @@ StateMachine::StateMachine() : currentState(GETCHAR), currentLine(1) {
 	dictionary["CONST"] = MODIFIER;
 	dictionary["const"] = MODIFIER;
 	
-	dictionary["'"]  = DELIMITERS;
-	dictionary[";"]  = DELIMITERS;	
+	dictionary["'"] = DELIMITERS;
+	dictionary[";"] = DELIMITERS;
+	dictionary[","] = DELIMITERS;
 	dictionary[" "] = DELIMITERS;
 	dictionary["("] = DELIMITERS;
 	dictionary[")"] = DELIMITERS;
@@ -261,7 +262,7 @@ bool StateMachine::TryCheckToken(std::string tokenStr) {
 
 bool StateMachine::IsChar(char ch) {
 	if ((ch >= 65 && ch <= 90) ||
-		(ch >= 97 && ch <= 122))
+		(ch >= 97 && ch <= 122) || ch == '_')
 		return true;
 
 	return false;

@@ -1,4 +1,5 @@
-FUNC valstr (string s); 
+FUNC valstr (string s, bool info); 
+FUNC valstr_1 (string s, bool info);
 
 PROGRAMM; 
   integer x;

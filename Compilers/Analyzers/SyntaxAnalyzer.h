@@ -13,14 +13,19 @@
 
 using namespace std;
 
+enum MESSAGE_TYPE {
+	DEFAULT,
+	LOST_DELIMITER,
+	FUNC_ALREADY_EXIST
+};
+
 struct vertex {
 	typedef pair<int, vertex*> ve;
 	vector<ve> adj; //cost of edge, destination vertex
 	string name;
 	vertex(string s) : name(s) {}
 };
-class graph
-{
+class graph{
 public:
 	typedef map<string, vertex*> vmap;
 	vmap work;
@@ -30,39 +35,35 @@ public:
 
 class Syntax {
 private:
+	// lexems
 	std::list<Token>* lexems;
 	std::list<Token>::iterator lexIter;
-	
-	Token tempGlobalToken;
-	
-	bool sequencesFlag;
-	bool whileFlag;
-	bool ifFlag;
+	// funcID, args
+	std::map<std::string, std::list<std::string>> functions;
+	std::string functionIdName;
+	std::string errors;
+
+	// helpers
+	bool readPrototype;
+	bool readArgs;
+	// id's
+	int funcUniqID;
 	
 	// main code
 	graph tree;
-	// functions
-	std::list<graph> functions;
+	// functions tree
+	std::list<graph> functionsTree;
 
 	void S();
 
+	void ID();
+	void ARGS();
 	void PROTOTYPE();
-	void PROGRAM();
-	void FUNC();
 
-	void RPOGRAM_BODY(bool inner = false);
+	void MAIN();
 
-	void IO();
-	void SEQUENCES();
-	void RETURN();
-
-	void EXPRESSION(Token leftId);
-	void CONSTRUCTION();
-
-	void IF();
-	void WHILE();
-
-	void CONDITION();
+	void error(Token& currentToken, MESSAGE_TYPE messageType = DEFAULT);
+	bool IsType(Token& currentToken);
 
 public:
 	void Action(StateMachine& machine, std::list<Token>* lexs);
