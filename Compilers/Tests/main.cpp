@@ -1,4 +1,4 @@
-FUNC valstr (string s, bool info); 
+FUNC valstr (string s); 
 FUNC valstr_1 (string s, bool info);
 
 PROGRAMM; 
@@ -11,9 +11,9 @@ PROGRAMM;
    DO 
     x=x-1; 
     
-    if x=5 then y= valstr(z) > 15;  
+    if x==5 then y=valstr(z) > 15;  
 		EXITWHILE; 
-    else y= valstr(z) <15 endif; 
+    else y=valstr(z) <15 endif; 
   ENDWHILE; 
 END.
 

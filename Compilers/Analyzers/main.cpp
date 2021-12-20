@@ -25,7 +25,7 @@ int main() {
 		analyzer.Analyze();
 	}
 	catch (std::exception& ex) {
-		cout << "[ERR]:> " << ex.what() << endl;
+		cout << ex.what() << endl;
 		system("pause>NULL");
 		return 1;
 	}

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <stack>
 #include <list>
 #include <map>
 
@@ -13,9 +14,15 @@
 
 using namespace std;
 
+/// <summary>
+/// Global rule: lexIter must be increment before using rule
+/// </summary>
+
 enum MESSAGE_TYPE {
+	EXTRA,
 	DEFAULT,
 	LOST_DELIMITER,
+	INCORRECT_TYPE,
 	FUNC_ALREADY_EXIST
 };
 
@@ -43,11 +50,17 @@ private:
 	std::string functionIdName;
 	std::string errors;
 
+	Token prevToken;
+
 	// helpers
+	bool afterMainProg;
+
 	bool readPrototype;
 	bool readArgs;
+	bool readIO;
 	// id's
 	int funcUniqID;
+	int uniq;
 	
 	// main code
 	graph tree;
@@ -61,8 +74,16 @@ private:
 	void PROTOTYPE();
 
 	void MAIN();
+	void BODY();
 
-	void error(Token& currentToken, MESSAGE_TYPE messageType = DEFAULT);
+	void IO();
+	void IF();
+	void WHILE();
+	void EXPRESSION();
+
+	void FUNC();
+
+	void error(Token& currentToken, MESSAGE_TYPE messageType = DEFAULT, std::string description = "");
 	bool IsType(Token& currentToken);
 
 public:
