@@ -21,6 +21,16 @@ void graph::addedge(const string& from, const string& to, double cost)
 
 void Syntax::Action(StateMachine& machine, 
 	std::list<Token>* lexs) {
+	objectFile.open("D:\\a.asm");
+	if (!objectFile.is_open())
+		throw SyntaxException("syntax:> cannot create object File");
+
+	auto idList = machine.GetMapId();
+	if (idList.size() > 0) {
+		objectFile << "section. data" << std::endl;
+		for (auto idItem : idList)
+			objectFile << "\t" << idItem.first << ": " << "db 4" << std::endl;
+	}
 	errors = "";
 	lexems = lexs;
 	lexIter = lexems->begin();
@@ -46,6 +56,8 @@ void Syntax::S() {
 	afterMainProg = true;
 
 	FUNC();
+
+	objectFile.close();
 }
 
 void Syntax::ID() {
@@ -73,6 +85,11 @@ void Syntax::ID() {
 			
 			tree.addvertex(tempName);
 			tree.addedge("IO", tempName);
+		}
+
+		if (readFunctions) {
+			objectFile << std::endl << currentToken.GetCodeData() << std::endl;
+			readFunctions = false;
 		}
 	}else
 		error(currentToken);
@@ -158,6 +175,10 @@ void Syntax::PROTOTYPE() {
 
 void Syntax::MAIN() {
 	Token currentToken = *lexIter;
+
+	objectFile << "section. text" << std::endl;
+	objectFile << "global _main" << std::endl;
+	objectFile << std::endl << "_main" << std::endl;
 
 	tree.addvertex("MAIN");
 	tree.addedge("S", "MAIN");
@@ -284,6 +305,8 @@ void Syntax::IF() {
 	Token currentToken = *lexIter;
 
 	if (currentToken.GetValue() == "if") {
+		objectFile << "\tcmp " << std::endl;
+
 		readCondition = true;
 		++lexIter;
 		EXPRESSION();
@@ -293,6 +316,7 @@ void Syntax::IF() {
 		if (currentToken.GetValue() == "then" ||
 			currentToken.GetValue() == "else") {
 			BODY();
+			objectFile << "\tend_cmp" << std::endl;
 		}
 		else
 			error(currentToken, EXTRA, "need body for IF");
@@ -303,6 +327,8 @@ void Syntax::WHILE() {
 	Token currentToken = *lexIter;
 
 	if (currentToken.GetValue() == "WHILE") {
+		objectFile << "\tloop " << std::endl;
+
 		// read condition
 		readCondition = true;
 		++lexIter;
@@ -312,6 +338,7 @@ void Syntax::WHILE() {
 		currentToken = *lexIter;
 		if (currentToken.GetValue() == "DO") {
 			BODY();
+			objectFile << "\tendloop" << std::endl;
 		}
 		else
 			error(currentToken, EXTRA, "need body for WHILE");
@@ -474,12 +501,55 @@ void Syntax::EXPRESSION() {
 	else
 		error(currentToken, EXTRA, "bad expression");
 
+		std::string register;
+	std::string tempData[2];
+
 	if (!polkStack.empty())
 		while (!polkStack.empty()) {
 			polkNotation.push_back(polkStack.top());
 			polkStack.pop();
 		}
 
+
+	int  i = 0;
+	for (auto polkItem : polkNotation) {
+		if (polkItem.GetName() == "ID" || polkItem.GetName() == "CONSTVAL") {
+			if(polkItem.GetName() == "ID")
+				objectFile << "mov " << prevToken.GetCodeData() << ", " <<
+					polkItem.GetCodeData() << std::endl;
+			else {
+				objectFile << "mov " << ((prevToken.GetName() == "CONSTVAL") ? prevToken.GetCodeData() : "eax") << ", " <<
+					polkItem.GetCodeData() << std::endl;
+
+				if (i == 2) {
+					tempData[i] = "temp_" + std::to_string(uniq);
+					i = 0;
+				}
+			}
+			
+			++i;
+		}
+
+		if (polkItem.GetName() == "operator") {
+			if (polkItem.GetValue() == "+")
+				objectFile << "\t\tadd " << prevToken.GetCodeData() << ", " << tempData[1] << std::endl;
+			if (polkItem.GetValue() == "-")
+				objectFile << "\t\tsub " << prevToken.GetCodeData() << ", " << tempData[1] << std::endl;
+			if (polkItem.GetValue() == "*")
+				objectFile << "\t\tmul " << prevToken.GetCodeData() << ", " << tempData[1] << std::endl;
+			if (polkItem.GetValue() == "/")
+				objectFile << "\t\tdiv " << prevToken.GetCodeData() << ", " << tempData[1] << std::endl;
+			if (polkItem.GetValue() == ">" || polkItem.GetValue() == "<" ||
+				polkItem.GetValue() == "!=" || polkItem.GetValue() == "==" ||
+				polkItem.GetValue() == ">=" || polkItem.GetValue() == "<=") {
+				objectFile << "\t\tcmp " << prevToken.GetCodeData() << ", " << tempData[1] << std::endl
+					<< "\t\tjmp next_" << std::to_string(++uniq) << std::endl;
+			}
+		}
+	}
+
+	objectFile << "mov " << prevToken.GetValue() << ", " <<
+		lexIter->GetValue() << std::endl;
 	// start create tree from polk stack
 	// only binary operations
 	// read from end
@@ -583,6 +653,7 @@ void Syntax::FUNC() {
 	readFunctions = true;
 	++lexIter;
 	PROTOTYPE();
+	BODY();
 	readFunctions = false;
 }
 

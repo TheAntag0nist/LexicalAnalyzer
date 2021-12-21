@@ -2,6 +2,7 @@
 #define SYNTAX_ANALYZER_H
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <stack>
@@ -49,6 +50,8 @@ private:
 	std::map<std::string, std::list<std::string>> functions;
 	std::string functionIdName;
 	std::string errors;
+
+	std::ofstream objectFile;
 
 	Token prevToken;
 
