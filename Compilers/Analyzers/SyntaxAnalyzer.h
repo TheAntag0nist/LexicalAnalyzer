@@ -54,7 +54,10 @@ private:
 
 	// helpers
 	bool afterMainProg;
+	bool itIsLogic;
 
+	bool readFunctions;
+	bool readCondition;
 	bool readPrototype;
 	bool readArgs;
 	bool readIO;

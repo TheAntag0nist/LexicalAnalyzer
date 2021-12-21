@@ -4,10 +4,12 @@ FUNC valstr_1 (string s, bool info);
 PROGRAMM; 
   integer x;
   bool y; 
+  bool whileControl;
   string z; 
   z="www";
+  whileControl = 1;
   
-  WHILE 1 
+  WHILE whileControl == 1 
    DO 
     x=x-1; 
     
@@ -18,7 +20,7 @@ PROGRAMM;
 END.
 
 FUNC valstr (string s); 
-    int pos; 
+    integer pos; 
     pos = 0;
 		
     WHILE s[pos] != '\0' DO 
@@ -26,4 +28,4 @@ FUNC valstr (string s);
     ENDWHILE; 
         
 	return pos; 
-ENDF; 
+ENDF;

@@ -1,0 +1,11 @@
+
+FUNC valstr (string s); 
+    int pos; 
+    pos = 0;
+		
+    WHILE s[pos] != '\0' DO 
+        pos = pos + 1; 
+    ENDWHILE; 
+        
+	return pos; 
+ENDF; 

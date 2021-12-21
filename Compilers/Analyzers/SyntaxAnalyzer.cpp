@@ -61,8 +61,10 @@ void Syntax::ID() {
 			functionIdName = currentToken.GetCodeData();
 			if (functions.find(functionIdName) == functions.end())
 				functions[functionIdName];
+			/*
 			else
 				error(currentToken, FUNC_ALREADY_EXIST);
+			*/
 		}
 		else if(readIO){
 			// save id
@@ -140,7 +142,17 @@ void Syntax::PROTOTYPE() {
 	if (lexIter->GetValue() != ";")
 		error(currentToken, LOST_DELIMITER);
 	++lexIter;
-	if (lexIter->GetValue() == "FUNC")
+
+	if (readFunctions) {
+		while (lexIter->GetValue() != ";" && lexIter != lexems->end())
+			++lexIter;
+		++lexIter;
+		IO();
+		++lexIter;
+		BODY();
+	}
+
+	if (lexIter->GetValue() == "FUNC" && !readFunctions)
 		PROTOTYPE();
 }
 
@@ -175,6 +187,16 @@ void Syntax::MAIN() {
 	++lexIter;
 	currentToken = *lexIter;
 
+	// need add errors
+	while (currentToken.GetValue() == "ENDWHILE" ||
+		currentToken.GetValue() == "endif") {
+		++lexIter;
+		++lexIter;
+
+		currentToken = *lexIter;
+	}
+
+	currentToken = *lexIter;
 	if (currentToken.GetValue() == "END") {
 		++lexIter;
 		currentToken = *lexIter;
@@ -192,6 +214,9 @@ void Syntax::MAIN() {
 
 // big minus - recursion
 void Syntax::BODY() {
+	if (lexIter == lexems->end())
+		throw SyntaxException("end");
+
 	Token currentToken = *lexIter;
 
 	if (currentToken.GetName() == "keyword") {
@@ -207,10 +232,18 @@ void Syntax::BODY() {
 
 	auto tempIter = lexIter;
 	++tempIter;
-	if (tempIter->GetValue() == "END") {
+	if (tempIter->GetValue() == "END" ||
+		tempIter->GetValue() == "endif" ||
+		tempIter->GetValue() == "ENDWHILE" ||
+		tempIter->GetValue() == "ENDF") {
 		++tempIter;
-		if (tempIter->GetValue() == ".")
+		if (tempIter->GetValue() == "." ||
+			tempIter->GetValue() == ";") {
+			lexIter = --(--tempIter);
 			return;
+		}
+		else
+			error(currentToken,LOST_DELIMITER);
 	}
 	else {
 		++lexIter;
@@ -250,17 +283,39 @@ void Syntax::IO() {
 void Syntax::IF() {
 	Token currentToken = *lexIter;
 
-	if (currentToken.GetValue() == "if")
-		while (lexIter->GetValue() != "endif")
-			++lexIter;
+	if (currentToken.GetValue() == "if") {
+		readCondition = true;
+		++lexIter;
+		EXPRESSION();
+		readCondition = false;
+
+		currentToken = *lexIter;
+		if (currentToken.GetValue() == "then" ||
+			currentToken.GetValue() == "else") {
+			BODY();
+		}
+		else
+			error(currentToken, EXTRA, "need body for IF");
+	}
 }
 
 void Syntax::WHILE() {
 	Token currentToken = *lexIter;
 
-	if(currentToken.GetValue() == "WHILE")
-		while (lexIter->GetValue() != "ENDWHILE")
-			++lexIter;
+	if (currentToken.GetValue() == "WHILE") {
+		// read condition
+		readCondition = true;
+		++lexIter;
+		EXPRESSION();
+		readCondition = false;
+		
+		currentToken = *lexIter;
+		if (currentToken.GetValue() == "DO") {
+			BODY();
+		}
+		else
+			error(currentToken, EXTRA, "need body for WHILE");
+	}
 }
 
 void Syntax::EXPRESSION() {
@@ -268,6 +323,7 @@ void Syntax::EXPRESSION() {
 	std::stack<Token> polkStack;
 	std::vector<Token> polkNotation;
 	std::string tempType = prevToken.GetType();
+	itIsLogic = false;
 
 	// save type
 	std::string tempName = "EXPRESSION " + std::to_string(++uniq);
@@ -276,22 +332,25 @@ void Syntax::EXPRESSION() {
 
 	std::string id = prevToken.GetCodeData() + " " + std::to_string(++uniq);
 	tree.addvertex(id);
-	std::string operatorSymbol = "= " + std::to_string(++uniq);
+	std::string operatorSymbol = currentToken.GetValue() + " " + std::to_string(++uniq);
 	tree.addvertex(operatorSymbol);
 
 	tree.addedge(operatorSymbol, id);
 	tree.addedge(tempName, operatorSymbol);
 
 	// polk notation for tree
-	if (currentToken.GetName() == "operator" &&
+	if ((currentToken.GetName() == "ID" ||
+		currentToken.GetName() == "CONSTVAL") || (currentToken.GetName() == "operator" &&
 		(currentToken.GetValue() == "=" ||
 			currentToken.GetValue() == "==" ||
 			currentToken.GetValue() == ">" ||
 			currentToken.GetValue() == ">=" ||
 			currentToken.GetValue() == "<" ||
-			currentToken.GetValue() == "<=")) {
+			currentToken.GetValue() == "<=" ||
+			currentToken.GetValue() == "!="))) {
 		// start read
-		while(lexIter->GetValue() != ";") {
+		while(lexIter->GetValue() != ";" && lexIter->GetValue() != "then" &&
+			lexIter->GetValue() != "DO") {
 			currentToken = *lexIter;
 			// if function or id
 			if (lexIter->GetName() == "ID") {
@@ -304,17 +363,57 @@ void Syntax::EXPRESSION() {
 						++lexIter;
 				}
 				else {
-					if (lexIter->GetType() != tempType)
+					if (lexIter->GetType() != tempType && (tempType == "integer" &&
+						lexIter->GetType() == "bool" || tempType == "bool" &&
+						lexIter->GetType() == "integer") && !itIsLogic)
 						error(currentToken, INCORRECT_TYPE);
 					polkNotation.push_back(*lexIter);
 				}
 			}
 
+			// ignore mass
+			if (lexIter->GetValue() == "[")
+				while (lexIter != lexems->end() && lexIter->GetValue() != "]")
+					++lexIter;
+
 			// if const val
 			if (lexIter->GetName() == "CONSTVAL") {
-				if (lexIter->GetType() != tempType)
+				if ((lexIter->GetType() != tempType && !(tempType == "integer" &&
+					lexIter->GetType() == "bool" || tempType == "bool" &&
+					lexIter->GetType() == "integer")) && !itIsLogic)
 					error(currentToken, INCORRECT_TYPE);
 				polkNotation.push_back(*lexIter);
+			}
+
+			if (lexIter->GetName() == "operator" &&
+				(lexIter->GetValue() == ">" ||
+					lexIter->GetValue() == "<" ||
+					lexIter->GetValue() == ">=" ||
+					lexIter->GetValue() == "<=" ||
+					lexIter->GetValue() == "!=" ||
+					lexIter->GetValue() == "==")) {
+				itIsLogic = true;
+				if (!polkStack.empty())
+					while (!polkStack.empty()) {
+						if (polkStack.top().GetValue() == "*" ||
+							polkStack.top().GetValue() == "/" ||
+							polkStack.top().GetValue() == "+" ||
+							polkStack.top().GetValue() == "-" || 
+							lexIter->GetValue() == ">" ||
+							lexIter->GetValue() == "<" ||
+							lexIter->GetValue() == ">=" ||
+							lexIter->GetValue() == "<=" ||
+							lexIter->GetValue() == "!=" ||
+							lexIter->GetValue() == "==") {
+							polkNotation.push_back(polkStack.top());
+							polkStack.pop();
+						}
+						else
+							break;
+					}
+
+				polkStack.push(*lexIter);
+
 			}
 
 			// if operator
@@ -401,6 +500,14 @@ void Syntax::EXPRESSION() {
 				operatorTokens.push_back(tempName);
 			}
 
+			/*
+							else {
+					std::string tempName = it->GetCodeData() + " " + std::to_string(++uniq);
+					tree.addvertex(tempName);
+					tree.addedge(*lastWithOffset, tempName);
+				}
+				*/
+
 			// if id or const val
 			if (it->GetName() == "CONSTVAL" || it->GetName() == "ID") {
 				std::list<std::string>::iterator lastWithOffset = --operatorTokens.end();
@@ -457,14 +564,26 @@ void Syntax::EXPRESSION() {
 
 		tree.addedge(operatorSymbol, *lastWithOffset);
 	}
-	else {
+	else if(polkNotation.size() <= 2){
 		auto it = polkNotation.begin();
 
+		std::string tempName = it->GetCodeData() + " " + std::to_string(++uniq);
+		tree.addvertex(tempName);
+		tree.addedge(operatorSymbol, tempName);
 	}
+	else
+		error(currentToken, EXTRA, "bad expression");
+
+	while (lexIter->GetValue() != ";" && lexIter->GetValue() != "then" &&
+		lexIter->GetValue() != "DO")
+		++lexIter;
 }
 
 void Syntax::FUNC() {
-
+	readFunctions = true;
+	++lexIter;
+	PROTOTYPE();
+	readFunctions = false;
 }
 
 
